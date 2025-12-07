@@ -3,6 +3,7 @@
 #include<string>
 #include<set>
 #include<map>
+#include <windows.h>
 using namespace std;
 
 void test_set1()
@@ -94,27 +95,54 @@ void test_map3()
 {
     string strs[] = {"西瓜","樱桃","西瓜","西瓜","香蕉","香蕉","西瓜","苹果"};
     map<string,int>countMap;
-    for(auto& str:strs)
+    // for(auto& str:strs)
+    // {
+    //     //1.如果水果没在map中，则插入成功
+    //     //2.如果水果已经在map中，插入失败，通过返回值拿到水果所在的节点迭代器，++次数
+    //     pair<map<string,int>::iterator,bool> ret = countMap.insert(make_pair(str,1));
+    //     if(ret.second == false)
+    //     {
+    //         ret.first->second++;
+    //     }
+    // }
+    // for(auto& str:strs)
+    // {
+    //     map<string,int>::iterator ret = countMap.find(str);
+    //     if(ret != countMap.end())
+    //     {
+    //         ret->second++;
+    //     }
+    //     else
+    //     {
+    //         countMap.insert(make_pair(str,1));
+    //     }
+    // }//还差一种统计方式
+    // mappped_type& operator[](const key_type& k)
+    // {
+    //     return(*((this->insert(make_pair(k,mapped_type()))).first)).second;
+    // }
+    for(auto& str :strs)
     {
-        map<string,int>::iterator ret = countMap.find(str);
-        if(ret != countMap.end())
-        {
-            ret->second++;
-        }
-        else
-        {
-            countMap.insert(make_pair(str,1));
-        }
+        //1.如果水果不在map中，则[]会插入pair<str,0>,返回映射对象（次数）的引用进行了++
+        //2.如果水果在map中，则operator[]返回水果对应的映射对象（次数）的引用，对它++
+        countMap[str]++;
     }
+    countMap["波罗蜜"];
+    countMap["波罗蜜"]=1;
+    cout<<countMap["波罗蜜"]<<'\n';
+    countMap["哈密瓜"]=5;
 
     for(auto& e:countMap)
     {
         cout<<e.first<<":"<<e.second<<'\n';
     }
 
+
 }
 int main()
 {
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
     // test_set1();
     // test_map();
     // test_map2();
