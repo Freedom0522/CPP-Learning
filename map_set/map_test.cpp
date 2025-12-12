@@ -3,6 +3,7 @@
 #include<string>
 #include<set>
 #include<map>
+#include<set>
 #include <windows.h>
 using namespace std;
 
@@ -132,10 +133,75 @@ void test_map3()
     cout<<countMap["波罗蜜"]<<'\n';
     countMap["哈密瓜"]=5;
 
+    std::map<std::string,std::string>dict;
+    dict.insert(make_pair("sort","排序"));
+    dict["string"];
+    dict["string"]="字符串";
+    dict["left"]="左边";
+
     for(auto& e:countMap)
     {
         cout<<e.first<<":"<<e.second<<'\n';
     }
+
+
+}
+
+void test_muti()
+{
+    //允许键值冗余
+    multiset<int>ms;
+    ms.insert(3);
+    ms.insert(2);
+    ms.insert(3);
+    ms.insert(1);
+    ms.insert(4);
+    ms.insert(5);
+    
+    for(auto e:ms)
+    {
+        cout << e<<" ";
+    }
+    cout << endl;
+
+    auto pos = ms.find(3);
+    cout<<*pos<<endl;
+    ++pos;
+    cout<<*pos<<endl;
+    ++pos;
+    cout<<*pos<<endl;
+    ++pos;
+
+    //排序加去重
+    // set<int>s;
+    // s.insert(3);
+    // s.insert(2);
+    // s.insert(3);
+    // s.insert(1);
+    // s.insert(4);
+    // s.insert(5);
+    
+    // for(auto e:s)
+    // {
+    //     cout << e<<" ";
+    // }
+    // cout << endl;
+
+    //muti_map和map区别上上面一样的
+    //附加的是muti_map没有opertaor[],因为当有多个相同的value，不知道返回哪个key对应的value
+
+    multimap<string,int>mm;
+    mm.insert(make_pair("苹果",1));
+    mm.insert(make_pair("苹果",1));
+    mm.insert(make_pair("苹果",1));
+    mm.insert(make_pair("西瓜",2));
+    mm.insert(make_pair("苹果",1));
+    mm.insert(make_pair("西瓜",1));
+
+   
+
+
+
 
 
 }
@@ -146,6 +212,7 @@ int main()
     // test_set1();
     // test_map();
     // test_map2();
-    test_map3();
+    // test_map3();
+    test_muti();
     return 0;
 }

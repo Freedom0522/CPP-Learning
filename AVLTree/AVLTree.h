@@ -1,0 +1,218 @@
+#pragma once
+
+
+template<class K,class V>
+struct AVLTreeNode
+{
+    AVLTreeNode<K,V>*_left;
+    AVLTreeNode<K,V>*_right;
+    AVLTreeNode<K,V>*_parent;
+
+    int _bf;//平衡因子
+    pair<K,V> _kv;
+
+    AVLTreeNode(const pair<K,V>& kv)
+    :_left(nullptr)
+    ,_right(nullptr)
+    ,_parent(nullptr)
+    ,_kv(kv)
+    ,_bf(0)
+    {}
+    /* data */
+};
+
+template<class K,class V>
+class AVLTree
+{
+    typedef AVLTreeNode<K.V>Node;
+
+    public:
+    bool Insert(const pair<K,V>& kv)
+    {
+        //1.先按搜索树的规则进行插入
+        if(_root == nullptr)
+        {
+            _root  = new Node(kv);
+            return true;
+        }
+        Node* parent = nullptr;
+        Node* cur = _root;
+
+        while(cur)
+        {
+            if(cur->kv,first>kv.first)
+            {
+                parent = cur;
+                cur = cur->_left;
+            }
+            else if(cur->_kv.first<kv.first)
+            {
+                parent = cur;
+                cur = cur->right;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        cur = new Node(kv);
+        if(parent->_kv.first<kv.first)
+        {
+            parent->_right = cur;
+            cur->_parent = parent;
+        }
+        else
+        {
+            parent->_left = cur;
+        }
+        //更新平衡因子
+        while(parent)
+        {
+            if(cur == parent->_right)
+            {
+                parent->_bf++;
+            }
+            else{
+                parent->_bf--;
+            }
+            if(parent->_bf == 0)
+            {
+                break;
+            }
+            else if(parent->_bf==1||parent->_bf==-1)
+            {
+                cur = parent;
+                parent = parent->_parent;
+            }
+            else if(parent->_bf =2||parent->_bf==-2)
+            {
+                //parent所在子树出现不平衡问题，需要旋转处理
+                //1.旋转前提保持他依旧是二叉搜索树
+                //2.旋转成平衡树
+                //3.对上层没有影响
+                if(parent->_bf == 2)
+                {
+                    if(cur->_bf == 1)
+                    {
+                        Rotatel(parent);
+                    }
+                    else if(cur->_bf == -1)
+                    {
+                        RotateRL(parent);
+                    }
+                }
+                else if(parent->_bf == -2)
+                {
+                    if(cur->_bf = -1)
+                    {
+                        RotateR(parent);
+                    }
+                    else if(cur->_bf == 1)
+                    {
+                        //双旋
+                    }
+                }
+                break;
+                //旋转完成后，parent所在的树的高度恢复到了插入节点前高度
+                //如果是子树，不对上层影响，更新结束
+            }
+        }
+        return true;
+    }
+
+    void Rotatel(Node* parent)
+    {
+        Node* subR = parent->_right;
+        Node* subRL = sunR->left;
+        Node* ppNode = parent->parent;
+        parent->_right = subRL;
+        if(subRL)subRL->_parent=parent;
+        subR->_left = parent;
+        parent->parent = subR;
+        //1.原来parent是这棵树的根
+        //2.parent为根的树只是整颗树的子树，改变链接关系，那么subR要顶替它的位置
+        if(_root==parent)
+        {
+            _root = subR;
+            subR->_parent = nullptr;
+        }
+        else
+        {
+            if(ppNode->_left == parent)ppNode->_left = subR;
+            else
+               ppNode->_right=subR;
+            subR->parent = ppNode;
+        }
+        parent->_buf = subR->_buf = 0;
+    }
+    void RotateR(Node* parent)
+    {
+        //parent发生失衡的节点
+        Node* subL = parent->_left;//导致发生失衡的节点
+        Node* subLR = subL->_right;
+        Node* ppNode = parent->parent;
+        //旋转操作
+        parent->_right = subLR;
+        if(subLR)subLR->_parent = parent;
+        subL->_right = parent;
+        parent->parent = subL;
+        //处理根节点问题
+        if(_root == parent)
+        {
+            _root = subL;
+            subL->_parent = nullptr;
+        }
+        else
+        {
+            if(ppNode->_right == parent)ppNode->_right = subL;
+            else ppNode->_right=subL;
+            subL->parent = ppNode;
+        }
+        parent->_buf = subL->_buf = 0;
+    }
+
+    // void Test(Node* parent)
+    // {
+    //     Node* suby = parent->_right;
+    //     Node* subx = suby->_left;
+    //     Node* subRR = subR->_right;
+    //     Node* subRL = subR->_left;
+    //     parent->_left = subRR;
+    //     subR->_right = subRL;  
+    // }
+
+    void RotateRL(Node* parent)
+    {
+        Node* subR = parent->_right;
+        Node* subRL = subR->_left;
+        int bf = subRL->_bf;
+        RotateR(parent->_right);
+        RotateL(parent);
+        //平衡因子的转换？
+        if(bf == -1)
+        {
+            parent->_bf = 0;
+            subR->_bf = 1;
+            subRL->_bf = 0;
+        }
+        else if(bf == 1)
+        {
+            subR->_bf = 0;
+            parent->_bf = -1;
+            subRL->_bf = 0;
+        }
+        else if(bf == 0)
+        {
+            subR->_bf = 0;
+            parent->_bf = 0;
+            subRL->_bf = 0;
+        }
+    } 
+    //左右双旋
+
+    
+
+    private:
+    Node* _root;
+
+};
