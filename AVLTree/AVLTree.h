@@ -1,4 +1,7 @@
 #pragma once
+#include <utility>
+#include<iostream>
+using std::pair;
 
 
 template<class K,class V>
@@ -24,9 +27,10 @@ struct AVLTreeNode
 template<class K,class V>
 class AVLTree
 {
-    typedef AVLTreeNode<K.V>Node;
+    typedef AVLTreeNode<K,V>Node;
 
     public:
+    AVLTree():_root(nullptr){}
     bool Insert(const pair<K,V>& kv)
     {
         //1.先按搜索树的规则进行插入
@@ -40,7 +44,7 @@ class AVLTree
 
         while(cur)
         {
-            if(cur->kv,first>kv.first)
+            if(cur->_kv.first>kv.first)
             {
                 parent = cur;
                 cur = cur->_left;
@@ -48,7 +52,7 @@ class AVLTree
             else if(cur->_kv.first<kv.first)
             {
                 parent = cur;
-                cur = cur->right;
+                cur = cur->_right;
             }
             else
             {
@@ -64,6 +68,7 @@ class AVLTree
         else
         {
             parent->_left = cur;
+            cur->_parent = parent;
         }
         //更新平衡因子
         while(parent)
@@ -84,7 +89,7 @@ class AVLTree
                 cur = parent;
                 parent = parent->_parent;
             }
-            else if(parent->_bf =2||parent->_bf==-2)
+            else if(parent->_bf ==2||parent->_bf==-2)
             {
                 //parent所在子树出现不平衡问题，需要旋转处理
                 //1.旋转前提保持他依旧是二叉搜索树
@@ -94,7 +99,7 @@ class AVLTree
                 {
                     if(cur->_bf == 1)
                     {
-                        Rotatel(parent);
+                        RotateL(parent);
                     }
                     else if(cur->_bf == -1)
                     {
@@ -103,13 +108,14 @@ class AVLTree
                 }
                 else if(parent->_bf == -2)
                 {
-                    if(cur->_bf = -1)
+                    if(cur->_bf == -1)
                     {
                         RotateR(parent);
                     }
                     else if(cur->_bf == 1)
                     {
                         //双旋
+                        RotateLR(parent);
                     }
                 }
                 break;
@@ -120,15 +126,15 @@ class AVLTree
         return true;
     }
 
-    void Rotatel(Node* parent)
+    void RotateL(Node* parent)
     {
         Node* subR = parent->_right;
-        Node* subRL = sunR->left;
-        Node* ppNode = parent->parent;
+        Node* subRL = subR->_left;
+        Node* ppNode = parent->_parent;
         parent->_right = subRL;
         if(subRL)subRL->_parent=parent;
         subR->_left = parent;
-        parent->parent = subR;
+        parent->_parent = subR;
         //1.原来parent是这棵树的根
         //2.parent为根的树只是整颗树的子树，改变链接关系，那么subR要顶替它的位置
         if(_root==parent)
@@ -141,21 +147,21 @@ class AVLTree
             if(ppNode->_left == parent)ppNode->_left = subR;
             else
                ppNode->_right=subR;
-            subR->parent = ppNode;
+            subR->_parent = ppNode;
         }
-        parent->_buf = subR->_buf = 0;
+        parent->_bf = subR->_bf = 0;
     }
     void RotateR(Node* parent)
     {
         //parent发生失衡的节点
         Node* subL = parent->_left;//导致发生失衡的节点
         Node* subLR = subL->_right;
-        Node* ppNode = parent->parent;
+        Node* ppNode = parent->_parent;
         //旋转操作
-        parent->_right = subLR;
+        parent->_left = subLR;
         if(subLR)subLR->_parent = parent;
         subL->_right = parent;
-        parent->parent = subL;
+        parent->_parent = subL;
         //处理根节点问题
         if(_root == parent)
         {
@@ -165,10 +171,10 @@ class AVLTree
         else
         {
             if(ppNode->_right == parent)ppNode->_right = subL;
-            else ppNode->_right=subL;
-            subL->parent = ppNode;
+            else ppNode->_left=subL;
+            subL->_parent = ppNode;
         }
-        parent->_buf = subL->_buf = 0;
+        parent->_bf = subL->_bf = 0;
     }
 
     // void Test(Node* parent)
@@ -209,10 +215,88 @@ class AVLTree
         }
     } 
     //左右双旋
+    void RotateLR(Node* parent)
+    {
+        Node* subL = parent->_left;
+        Node* subLR = subL->_right;
+        int bf = subLR->_bf;
 
-    
+        RotateL(subL);
+        RotateR(parent);
+
+        if(bf == 1)
+        {
+            parent->_bf = 0;
+            subL->_bf = -1;
+            subLR->_bf = 0;
+        }
+        else if(bf == -1)
+        {
+            parent->_bf =1;
+            subL->_bf =0;
+            subLR->_bf =0;
+        }
+        else if(bf == 0)
+        {
+            parent->_bf = 0;
+            subL->_bf = 0;
+            subLR->_bf = 0;
+        }
+    }
+
+    void _InOrder(Node* root)
+	{
+		if (root == nullptr)
+		{
+			return;//返回
+		}
+		_InOrder(root->_left);//一直走左子树
+		std::cout << root->_kv.first << ": "<<root->_kv.second<<" ";
+		/* std::cout << '\n';*/
+		_InOrder(root->_right);//走右子树
+	};
+
+	void InOrder()
+	{
+		_InOrder(_root);
+	}//中序遍历this指针
+
+    int Height(Node* root)
+    {
+        if(root == nullptr)return 0;
+        int leftHeight = Height(root->_left);
+        int rightHeight = Height(root->_right);
+
+        return leftHeight>rightHeight?leftHeight+1:rightHeight+1;
+    }
+
+    bool _IsBanlance(Node* root)
+    {
+        if(root == nullptr)return true;
+        int leftHeight = Height(root->_left);
+        int rightHeight = Height(root->_right);
+
+        return abs(leftHeight - rightHeight) < 2 && _IsBanlance(root->_left)&&_IsBanlance(root->_right);
+    }
+
+    bool IsBalance()
+    {
+        return _IsBanlance(_root);
+    }
 
     private:
     Node* _root;
 
 };
+
+void TestAVLTree()
+{
+    int  a[] = {16,3,7,11,9,26,18,14,15};
+    AVLTree<int,int>t;
+    for(auto e:a)
+    {
+        t.Insert(std::make_pair(e,e));
+    }
+    t.InOrder();
+    std::cout<< t.IsBalance()<<'\n';
+}
